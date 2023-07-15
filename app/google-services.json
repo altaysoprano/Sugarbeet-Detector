@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "196668727665",
+    "project_id": "aifarmingapp",
+    "storage_bucket": "aifarmingapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:196668727665:android:8fba2beddb9f9f3a8b16d0",
+        "android_client_info": {
+          "package_name": "com.example.aifarmingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "196668727665-lqp6m52814d9lstenmc40a1hm6r58do7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpFj220ZFt4ar0yRimHuBQqE_ZaGPCFW8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "196668727665-lqp6m52814d9lstenmc40a1hm6r58do7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
