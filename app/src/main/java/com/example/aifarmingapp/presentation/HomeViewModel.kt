@@ -1,7 +1,12 @@
 package com.example.aifarmingapp.presentation
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.hardware.camera2.CameraDevice
+import android.hardware.camera2.CameraManager
+import android.hardware.camera2.CaptureRequest
+import android.os.Handler
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -26,9 +31,4 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             requestPermissions
         }
     }
-
-    fun onRequestPermissionResult() {
-
-    }
-
 }
