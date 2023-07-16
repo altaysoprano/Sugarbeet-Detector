@@ -1,5 +1,9 @@
 package com.example.aifarmingapp.presentation
 
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+import androidx.core.content.PackageManagerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,7 +17,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val repository: Repository
-): ViewModel() {
+) : ViewModel() {
 
     private val _signInState = MutableLiveData<UiState<String>>()
     val signInState: LiveData<UiState<String>>
