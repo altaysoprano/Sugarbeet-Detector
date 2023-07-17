@@ -1,5 +1,6 @@
 package com.example.aifarmingapp.presentation
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -7,6 +8,13 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.graphics.SurfaceTexture
+import android.hardware.camera2.CameraCaptureSession
+import android.hardware.camera2.CameraDevice
+import android.hardware.camera2.CameraManager
+import android.os.Handler
+import android.view.Surface
+import android.view.TextureView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import com.example.aifarmingapp.ml.Detect
@@ -23,6 +31,9 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor() : ViewModel() {
 
     private var firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    var isPermissionGranted = false
+    private lateinit var cameraDevice: CameraDevice
+    private lateinit var cameraManager: CameraManager
     private lateinit var navRegister: FragmentNavigation
     var paint = Paint()
     var colors = listOf<Int>(
@@ -36,7 +47,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                 android.Manifest.permission.CAMERA
             ) != PackageManager.PERMISSION_GRANTED
         ) {
+            isPermissionGranted = false
             requestPermissions
+        } else {
+            isPermissionGranted = true
         }
     }
 
@@ -113,6 +127,43 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         }
 
         return mutable
+    }
+
+    @SuppressLint("MissingPermission")
+    fun openCamera(surfaceTexture: SurfaceTexture, context: Context, handler: Handler) {
+        cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        cameraManager.openCamera(cameraManager.cameraIdList[0], object: CameraDevice.StateCallback(){
+            override fun onOpened(p0: CameraDevice) {
+                cameraDevice = p0
+
+                var surface = Surface(surfaceTexture)
+
+                var captureRequest = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                captureRequest.addTarget(surface)
+
+                cameraDevice.createCaptureSession(listOf(surface), object: CameraCaptureSession.StateCallback(){
+                    override fun onConfigured(p0: CameraCaptureSession) {
+                        p0.setRepeatingRequest(captureRequest.build(), null, null)
+                    }
+
+                    override fun onConfigureFailed(p0: CameraCaptureSession) {
+
+                    }
+                }, handler)
+            }
+
+            override fun onDisconnected(p0: CameraDevice) {
+
+            }
+
+            override fun onError(p0: CameraDevice, p1: Int) {
+
+            }
+        }, handler)
+    }
+
+    fun closeCamera() {
+        cameraDevice.close()
     }
 
 }

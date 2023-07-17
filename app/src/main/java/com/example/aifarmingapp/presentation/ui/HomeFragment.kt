@@ -24,6 +24,7 @@ import android.view.Surface
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import com.example.aifarmingapp.R
 import com.example.aifarmingapp.databinding.FragmentHomeBinding
@@ -37,17 +38,11 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 class HomeFragment : Fragment() {
 
     lateinit var labels: List<String>
-    var paint = Paint()
-    var colors = listOf<Int>(
-        Color.BLUE, Color.GREEN, Color.RED, Color.CYAN, Color.GRAY, Color.BLACK,
-        Color.DKGRAY, Color.MAGENTA, Color.YELLOW, Color.RED)
     private lateinit var binding: FragmentHomeBinding
     private lateinit var bitmap: Bitmap
     private lateinit var handler: Handler
     private lateinit var model: Detect
-    private lateinit var cameraDevice: CameraDevice
     private val viewModel: HomeViewModel by viewModels()
-    private lateinit var cameraManager: CameraManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,18 +50,18 @@ class HomeFragment : Fragment() {
     ): View {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false)
+        (activity as AppCompatActivity?)!!.supportActionBar!!.show()
         labels = FileUtil.loadLabels(requireContext(), "labels.txt")
         model = Detect.newInstance(requireContext())
         setHasOptionsMenu(true)
         viewModel.getPermission(requireContext(), requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101))
 
-        cameraManager = requireContext().getSystemService(Context.CAMERA_SERVICE) as CameraManager
         val handlerThread = HandlerThread("videoThread")
         handlerThread.start()
         handler = Handler(handlerThread.looper)
         binding.textureView.surfaceTextureListener = object:TextureView.SurfaceTextureListener{
             override fun onSurfaceTextureAvailable(p0: SurfaceTexture, p1: Int, p2: Int) {
-                openCamera()
+                binding.textureView.surfaceTexture?.let { viewModel.openCamera(it, requireContext(), handler) }
             }
 
             override fun onSurfaceTextureSizeChanged(p0: SurfaceTexture, p1: Int, p2: Int) {
@@ -83,12 +78,12 @@ class HomeFragment : Fragment() {
             }
 
         }
-
         return binding.root
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        viewModel.closeCamera()
         model.close()
     }
 
@@ -101,39 +96,6 @@ class HomeFragment : Fragment() {
         if(grantResults[0] != PackageManager.PERMISSION_GRANTED) {
             viewModel.getPermission(requireContext(), requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101))
         }
-    }
-
-    @SuppressLint("MissingPermission")
-    fun openCamera() {
-        cameraManager.openCamera(cameraManager.cameraIdList[0], object: CameraDevice.StateCallback(){
-            override fun onOpened(p0: CameraDevice) {
-                cameraDevice = p0
-
-                var surfaceTexture = binding.textureView.surfaceTexture
-                var surface = Surface(surfaceTexture)
-
-                var captureRequest = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-                captureRequest.addTarget(surface)
-
-                cameraDevice.createCaptureSession(listOf(surface), object: CameraCaptureSession.StateCallback(){
-                    override fun onConfigured(p0: CameraCaptureSession) {
-                        p0.setRepeatingRequest(captureRequest.build(), null, null)
-                    }
-
-                    override fun onConfigureFailed(p0: CameraCaptureSession) {
-
-                    }
-                }, handler)
-            }
-
-            override fun onDisconnected(p0: CameraDevice) {
-
-            }
-
-            override fun onError(p0: CameraDevice, p1: Int) {
-
-            }
-        }, handler)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -149,6 +111,4 @@ class HomeFragment : Fragment() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-
 }
