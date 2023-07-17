@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import com.example.aifarmingapp.databinding.FragmentRegisterBinding
 import com.example.aifarmingapp.presentation.LoginViewModel
@@ -27,6 +28,7 @@ class RegisterFragment : Fragment() {
     ): View {
 
         binding = FragmentRegisterBinding.inflate(inflater, container, false)
+        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
         navRegister = activity as FragmentNavigation
 
         binding.textView.setOnClickListener {
@@ -38,30 +40,38 @@ class RegisterFragment : Fragment() {
             val pass = binding.passET.text.toString()
             val confirmPass = binding.confirmPassEt.text.toString()
 
-            if(email.isNotEmpty() && pass.isNotEmpty() && confirmPass.isNotEmpty()) {
-                if(pass == confirmPass) {
+            if (email.isNotEmpty() && pass.isNotEmpty() && confirmPass.isNotEmpty()) {
+                if (pass == confirmPass) {
                     viewModel.signUp(email, pass)
                 } else {
-                    Toast.makeText(requireContext(), "Passwords do not match", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Passwords do not match", Toast.LENGTH_SHORT)
+                        .show()
                 }
             } else {
-                Toast.makeText(requireContext(), "Email, password or confirmation password cannot be left blank !", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Email, password or confirmation password cannot be left blank !",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
         viewModel.signUpState.observe(viewLifecycleOwner) { state ->
-            when(state) {
+            when (state) {
                 is UiState.Loading -> {
                     binding.progressBarSignUp.visibility = View.VISIBLE
                 }
+
                 is UiState.Failure -> {
                     binding.progressBarSignUp.visibility = View.GONE
-                    Toast.makeText(requireContext(), state.error.toString(), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), state.error.toString(), Toast.LENGTH_SHORT)
+                        .show()
                 }
 
                 is UiState.Success -> {
                     binding.progressBarSignUp.visibility = View.GONE
-                    Toast.makeText(requireContext(), "Successfully signed up", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Successfully signed up", Toast.LENGTH_SHORT)
+                        .show()
                     navRegister.navigateFrag(LoginFragment(), false)
                 }
 
@@ -71,5 +81,4 @@ class RegisterFragment : Fragment() {
         }
         return binding.root
     }
-
 }

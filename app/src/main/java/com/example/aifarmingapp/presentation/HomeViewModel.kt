@@ -3,19 +3,18 @@ package com.example.aifarmingapp.presentation
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.aifarmingapp.util.UiState
+import com.example.aifarmingapp.presentation.ui.FragmentNavigation
+import com.example.aifarmingapp.presentation.ui.LoginFragment
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor() : ViewModel() {
 
-    private val _permissionState = MutableLiveData<UiState<String>>()
-    val permissionState: LiveData<UiState<String>>
-        get() = _permissionState
+    private var firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    private lateinit var navRegister: FragmentNavigation
 
     fun getPermission(context: Context, requestPermissions: Unit) {
         if (ContextCompat.checkSelfPermission(
@@ -25,6 +24,12 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         ) {
             requestPermissions
         }
+    }
+
+    fun signOut(activity: FragmentNavigation) {
+        navRegister = activity as FragmentNavigation
+        firebaseAuth.signOut()
+        navRegister.navigateFrag(LoginFragment(), false)
     }
 
 }
