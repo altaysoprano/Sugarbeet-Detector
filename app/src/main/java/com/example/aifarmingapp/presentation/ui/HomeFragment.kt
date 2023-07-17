@@ -24,7 +24,6 @@ import android.view.Surface
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import com.example.aifarmingapp.R
 import com.example.aifarmingapp.databinding.FragmentHomeBinding
@@ -41,8 +40,7 @@ class HomeFragment : Fragment() {
     var paint = Paint()
     var colors = listOf<Int>(
         Color.BLUE, Color.GREEN, Color.RED, Color.CYAN, Color.GRAY, Color.BLACK,
-        Color.DKGRAY, Color.MAGENTA, Color.YELLOW, Color.RED
-    )
+        Color.DKGRAY, Color.MAGENTA, Color.YELLOW, Color.RED)
     private lateinit var binding: FragmentHomeBinding
     private lateinit var bitmap: Bitmap
     private lateinit var handler: Handler
@@ -57,20 +55,16 @@ class HomeFragment : Fragment() {
     ): View {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        (activity as AppCompatActivity?)!!.supportActionBar!!.show()
         labels = FileUtil.loadLabels(requireContext(), "labels.txt")
         model = Detect.newInstance(requireContext())
         setHasOptionsMenu(true)
-        viewModel.getPermission(
-            requireContext(),
-            requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101)
-        )
+        viewModel.getPermission(requireContext(), requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101))
 
         cameraManager = requireContext().getSystemService(Context.CAMERA_SERVICE) as CameraManager
         val handlerThread = HandlerThread("videoThread")
         handlerThread.start()
         handler = Handler(handlerThread.looper)
-        binding.textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+        binding.textureView.surfaceTextureListener = object:TextureView.SurfaceTextureListener{
             override fun onSurfaceTextureAvailable(p0: SurfaceTexture, p1: Int, p2: Int) {
                 openCamera()
             }
@@ -84,56 +78,7 @@ class HomeFragment : Fragment() {
 
             override fun onSurfaceTextureUpdated(p0: SurfaceTexture) {
                 bitmap = binding.textureView.bitmap!!
-                val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true)
-
-                val inputFeature0 =
-                    TensorBuffer.createFixedSize(intArrayOf(1, 300, 300, 3), DataType.UINT8)
-                val tensorImage = TensorImage(DataType.UINT8)
-                tensorImage.load(resizedBitmap);
-                val byteBuffer = tensorImage.buffer
-                inputFeature0.loadBuffer(byteBuffer)
-
-                val outputs = model.process(inputFeature0)
-                val locations = outputs.outputFeature0AsTensorBuffer.floatArray
-                val classes = outputs.outputFeature1AsTensorBuffer.floatArray
-                val scores = outputs.outputFeature2AsTensorBuffer.floatArray
-                val numberOfDetections = outputs.outputFeature3AsTensorBuffer.floatArray
-
-                var mutable = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-                val canvas = Canvas(mutable)
-
-                val h = mutable.height
-                val w = mutable.width
-                paint.textSize = h / 15f
-                paint.strokeWidth = h / 85f
-                var x = 0
-                scores.forEachIndexed { index, fl ->
-                    x = index
-                    x *= 4
-                    if (fl > 0.5) {
-                        paint.setColor(colors.get(index))
-                        paint.style = Paint.Style.STROKE
-                        canvas.drawRect(
-                            RectF(
-                                locations.get(x + 1) * w,
-                                locations.get(x) * h,
-                                locations.get(x + 3) * w,
-                                locations.get(x + 2) * h
-                            ), paint
-                        )
-                        paint.style = Paint.Style.FILL
-                        canvas.drawText(
-                            labels.get(
-                                classes.get(index).toInt()
-                            ) + " " + fl.toString(),
-                            locations.get(x + 1) * w,
-                            locations.get(x) * h,
-                            paint
-                        )
-                    }
-                }
-
-                binding.imageView.setImageBitmap(mutable)
+                binding.imageView.setImageBitmap(viewModel.onDetection(bitmap, model, labels))
 
             }
 
@@ -153,54 +98,42 @@ class HomeFragment : Fragment() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-            viewModel.getPermission(
-                requireContext(),
-                requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101)
-            )
+        if(grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            viewModel.getPermission(requireContext(), requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101))
         }
     }
 
     @SuppressLint("MissingPermission")
     fun openCamera() {
-        cameraManager.openCamera(
-            cameraManager.cameraIdList[0],
-            object : CameraDevice.StateCallback() {
-                override fun onOpened(p0: CameraDevice) {
-                    cameraDevice = p0
+        cameraManager.openCamera(cameraManager.cameraIdList[0], object: CameraDevice.StateCallback(){
+            override fun onOpened(p0: CameraDevice) {
+                cameraDevice = p0
 
-                    var surfaceTexture = binding.textureView.surfaceTexture
-                    var surface = Surface(surfaceTexture)
+                var surfaceTexture = binding.textureView.surfaceTexture
+                var surface = Surface(surfaceTexture)
 
-                    var captureRequest =
-                        cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-                    captureRequest.addTarget(surface)
+                var captureRequest = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                captureRequest.addTarget(surface)
 
-                    cameraDevice.createCaptureSession(
-                        listOf(surface),
-                        object : CameraCaptureSession.StateCallback() {
-                            override fun onConfigured(p0: CameraCaptureSession) {
-                                p0.setRepeatingRequest(captureRequest.build(), null, null)
-                            }
+                cameraDevice.createCaptureSession(listOf(surface), object: CameraCaptureSession.StateCallback(){
+                    override fun onConfigured(p0: CameraCaptureSession) {
+                        p0.setRepeatingRequest(captureRequest.build(), null, null)
+                    }
 
-                            override fun onConfigureFailed(p0: CameraCaptureSession) {
+                    override fun onConfigureFailed(p0: CameraCaptureSession) {
 
-                            }
-                        },
-                        handler
-                    )
-                }
+                    }
+                }, handler)
+            }
 
-                override fun onDisconnected(p0: CameraDevice) {
+            override fun onDisconnected(p0: CameraDevice) {
 
-                }
+            }
 
-                override fun onError(p0: CameraDevice, p1: Int) {
+            override fun onError(p0: CameraDevice, p1: Int) {
 
-                }
-            },
-            handler
-        )
+            }
+        }, handler)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
