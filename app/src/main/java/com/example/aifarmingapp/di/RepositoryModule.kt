@@ -16,7 +16,7 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideTransactionRepository(
+    fun provideRepository(
         firebaseAuth: FirebaseAuth,
         database: FirebaseFirestore
     ) : Repository {

@@ -18,7 +18,10 @@ import com.example.aifarmingapp.databinding.FragmentCameraBinding
 import com.example.aifarmingapp.databinding.FragmentHomeBinding
 import com.example.aifarmingapp.presentation.ui.CameraFragment
 import com.example.aifarmingapp.presentation.ui.FragmentNavigation
+import com.example.aifarmingapp.util.UiState
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
@@ -45,6 +48,26 @@ class HomeFragment : Fragment() {
             } else {
                 requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101)
             }
+        }
+
+        viewModel.sugarBeetCountState.observe(viewLifecycleOwner) { state ->
+            when(state) {
+                is UiState.Loading -> {
+                    binding.progressBarHome.visibility = View.VISIBLE
+                }
+
+                is UiState.Failure -> {
+                    binding.progressBarHome.visibility = View.GONE
+                    Toast.makeText(requireContext(), state.error.toString(), Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                is UiState.Success -> {
+                    binding.progressBarHome.visibility = View.GONE
+                    binding.tvDetectionsCount.text = state.data.toString()
+                }
+            }
+
         }
 
         return binding.root

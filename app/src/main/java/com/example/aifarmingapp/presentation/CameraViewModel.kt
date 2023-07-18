@@ -12,9 +12,14 @@ import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
 import android.os.Handler
+import android.util.Log
 import android.view.Surface
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.aifarmingapp.data.repository.Repository
 import com.example.aifarmingapp.ml.Detect
+import com.example.aifarmingapp.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.TensorImage
@@ -22,7 +27,9 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import javax.inject.Inject
 
 @HiltViewModel
-class CameraViewModel @Inject constructor() : ViewModel() {
+class CameraViewModel @Inject constructor(
+    private val repository: Repository
+) : ViewModel() {
 
     private lateinit var cameraDevice: CameraDevice
     var numberOfSugarbeets = 0
@@ -32,6 +39,17 @@ class CameraViewModel @Inject constructor() : ViewModel() {
         Color.BLUE, Color.GREEN, Color.RED, Color.CYAN, Color.GRAY, Color.BLACK,
         Color.DKGRAY, Color.MAGENTA, Color.YELLOW, Color.RED
     )
+
+    private val _updateSugarbeetCount = MutableLiveData<UiState<String>>()
+    val updateSugarbeetCount: LiveData<UiState<String>>
+        get() = _updateSugarbeetCount
+
+    fun updateSugarBeetCount() {
+        _updateSugarbeetCount.value = UiState.Loading
+        repository.updateSugarBeetCount(numberOfSugarbeets) {
+            _updateSugarbeetCount.value = it
+        }
+    }
 
     fun onDetection(bitmap: Bitmap, model: Detect, labels: List<String>): Bitmap {
         val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true)
@@ -137,5 +155,4 @@ class CameraViewModel @Inject constructor() : ViewModel() {
     fun closeCamera() {
         cameraDevice.close()
     }
-
 }

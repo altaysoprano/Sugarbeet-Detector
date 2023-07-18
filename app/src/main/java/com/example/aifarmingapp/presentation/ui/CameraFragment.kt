@@ -1,10 +1,12 @@
 package com.example.aifarmingapp.presentation.ui
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.TextureView
@@ -16,8 +18,11 @@ import androidx.fragment.app.viewModels
 import com.example.aifarmingapp.databinding.FragmentCameraBinding
 import com.example.aifarmingapp.ml.Detect
 import com.example.aifarmingapp.presentation.CameraViewModel
+import com.example.aifarmingapp.util.UiState
+import dagger.hilt.android.AndroidEntryPoint
 import org.tensorflow.lite.support.common.FileUtil
 
+@AndroidEntryPoint
 class CameraFragment : Fragment() {
 
     lateinit var labels: List<String>
@@ -60,6 +65,7 @@ class CameraFragment : Fragment() {
         }
 
         binding.closeBtn.setOnClickListener {
+            viewModel.updateSugarBeetCount()
             activity?.onBackPressed()
         }
 
@@ -68,10 +74,11 @@ class CameraFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        val rectangleCount = viewModel.numberOfSugarbeets
-        Toast.makeText(requireContext(), "Total Number Of SugarBeets: $rectangleCount", Toast.LENGTH_SHORT).show()
+        val sugarbeetCount = viewModel.numberOfSugarbeets
+        Toast.makeText(requireContext(), "Total Number Of SugarBeets: $sugarbeetCount", Toast.LENGTH_SHORT).show()
         viewModel.closeCamera()
         model.close()
     }
+
 
 }
