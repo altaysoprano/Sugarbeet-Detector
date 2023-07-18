@@ -5,5 +5,3 @@ The project is developed with the MVVM architecture. Firebase Authentication is 
 
 [![](https://markdown-videos.vercel.app/youtube/{CsiltncYXuc})](https://youtu.be/{CsiltncYXuc})
 
-[![Sugarbeet Detector App](https://img.youtube.com/vi/CsiltncYXuc/0.jpg)](https://www.youtube.com/watch?v=CsiltncYXuc)
-
