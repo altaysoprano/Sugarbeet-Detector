@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import com.example.aifarmingapp.R
 import com.example.aifarmingapp.databinding.FragmentLoginBinding
+import com.example.aifarmingapp.presentation.HomeFragment
 import com.example.aifarmingapp.presentation.LoginViewModel
 import com.example.aifarmingapp.util.UiState
 import dagger.hilt.android.AndroidEntryPoint
