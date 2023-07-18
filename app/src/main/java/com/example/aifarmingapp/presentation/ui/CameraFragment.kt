@@ -1,6 +1,5 @@
 package com.example.aifarmingapp.presentation.ui
 
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.os.Bundle
@@ -11,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import com.example.aifarmingapp.databinding.FragmentCameraBinding
@@ -36,8 +36,6 @@ class CameraFragment : Fragment() {
         (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
         labels = FileUtil.loadLabels(requireContext(), "labels.txt")
         model = Detect.newInstance(requireContext())
-        setHasOptionsMenu(true)
-        viewModel.getPermission(requireContext(), requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101))
 
         val handlerThread = HandlerThread("videoThread")
         handlerThread.start()
@@ -70,19 +68,10 @@ class CameraFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        val rectangleCount = viewModel.numberOfSugarbeets
+        Toast.makeText(requireContext(), "Total Number Of SugarBeets: $rectangleCount", Toast.LENGTH_SHORT).show()
         viewModel.closeCamera()
         model.close()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if(grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-            viewModel.getPermission(requireContext(), requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101))
-        }
     }
 
 }

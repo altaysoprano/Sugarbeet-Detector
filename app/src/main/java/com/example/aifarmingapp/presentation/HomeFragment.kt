@@ -1,5 +1,6 @@
 package com.example.aifarmingapp.presentation
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,7 +9,9 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.example.aifarmingapp.R
 import com.example.aifarmingapp.databinding.FragmentCameraBinding
@@ -33,7 +36,15 @@ class HomeFragment : Fragment() {
         setHasOptionsMenu(true)
 
         binding.detectButton.setOnClickListener {
-            navRegister.navigateFrag(CameraFragment(), true)
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                navRegister.navigateFrag(CameraFragment(), true)
+            } else {
+                requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101)
+            }
         }
 
         return binding.root
@@ -52,4 +63,20 @@ class HomeFragment : Fragment() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 101) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                navRegister.navigateFrag(CameraFragment(), true)
+            } else {
+                Toast.makeText(requireContext(), "You must give camera permission.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 }

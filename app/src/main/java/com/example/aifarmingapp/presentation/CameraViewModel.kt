@@ -2,7 +2,6 @@ package com.example.aifarmingapp.presentation
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -13,14 +12,9 @@ import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
 import android.os.Handler
-import android.util.Log
 import android.view.Surface
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import com.example.aifarmingapp.ml.Detect
-import com.example.aifarmingapp.presentation.ui.FragmentNavigation
-import com.example.aifarmingapp.presentation.ui.LoginFragment
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.TensorImage
@@ -30,27 +24,14 @@ import javax.inject.Inject
 @HiltViewModel
 class CameraViewModel @Inject constructor() : ViewModel() {
 
-    var isPermissionGranted = false
     private lateinit var cameraDevice: CameraDevice
+    var numberOfSugarbeets = 0
     private lateinit var cameraManager: CameraManager
     var paint = Paint()
     var colors = listOf<Int>(
         Color.BLUE, Color.GREEN, Color.RED, Color.CYAN, Color.GRAY, Color.BLACK,
         Color.DKGRAY, Color.MAGENTA, Color.YELLOW, Color.RED
     )
-
-    fun getPermission(context: Context, requestPermissions: Unit) {
-        if (ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.CAMERA
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            isPermissionGranted = false
-            requestPermissions
-        } else {
-            isPermissionGranted = true
-        }
-    }
 
     fun onDetection(bitmap: Bitmap, model: Detect, labels: List<String>): Bitmap {
         val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true)
@@ -73,9 +54,9 @@ class CameraViewModel @Inject constructor() : ViewModel() {
 
         val h = mutable.height
         val w = mutable.width
-        val scaleFactor = 0.5f // Yazı boyutunu düzenlemek için bir ölçek faktörü
+        val scaleFactor = 0.5f
 
-        paint.textSize = (h / 15f * scaleFactor).coerceAtLeast(1f) // Yazı boyutunu en az 1 olarak sınırla
+        paint.textSize = (h / 15f * scaleFactor).coerceAtLeast(1f)
         paint.strokeWidth = h / 85f
         var x = 0
         scores.forEachIndexed { index, fl ->
@@ -113,7 +94,7 @@ class CameraViewModel @Inject constructor() : ViewModel() {
                         paint
                     )
                 }
-                Log.d("Mesaj: ", "çizildi")
+                numberOfSugarbeets++
             }
         }
 
