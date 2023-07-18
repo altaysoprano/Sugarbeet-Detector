@@ -60,7 +60,6 @@ class CameraFragment : Fragment() {
             override fun onSurfaceTextureUpdated(p0: SurfaceTexture) {
                 bitmap = binding.textureView.bitmap!!
                 binding.imageView.setImageBitmap(viewModel.onDetection(bitmap, model, labels))
-
             }
         }
 
@@ -74,8 +73,7 @@ class CameraFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        val sugarbeetCount = viewModel.numberOfSugarbeets
-        Toast.makeText(requireContext(), "Total Number Of SugarBeets: $sugarbeetCount", Toast.LENGTH_SHORT).show()
+        viewModel.updateSugarBeetCount()
         viewModel.closeCamera()
         model.close()
     }

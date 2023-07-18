@@ -2,6 +2,7 @@ package com.example.aifarmingapp.presentation
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -67,7 +68,6 @@ class HomeFragment : Fragment() {
                     binding.tvDetectionsCount.text = state.data.toString()
                 }
             }
-
         }
 
         return binding.root
@@ -98,6 +98,29 @@ class HomeFragment : Fragment() {
                 navRegister.navigateFrag(CameraFragment(), true)
             } else {
                 Toast.makeText(requireContext(), "You must give camera permission.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getSugarBeetCount()
+        viewModel.sugarBeetCountState.observe(viewLifecycleOwner) { state ->
+            when(state) {
+                is UiState.Loading -> {
+                    binding.progressBarHome.visibility = View.VISIBLE
+                }
+
+                is UiState.Failure -> {
+                    binding.progressBarHome.visibility = View.GONE
+                    Toast.makeText(requireContext(), state.error.toString(), Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                is UiState.Success -> {
+                    binding.progressBarHome.visibility = View.GONE
+                    binding.tvDetectionsCount.text = state.data.toString()
+                }
             }
         }
     }

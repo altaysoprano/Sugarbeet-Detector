@@ -126,9 +126,9 @@ class CameraViewModel @Inject constructor(
             override fun onOpened(p0: CameraDevice) {
                 cameraDevice = p0
 
-                var surface = Surface(surfaceTexture)
+                val surface = Surface(surfaceTexture)
 
-                var captureRequest = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                val captureRequest = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
                 captureRequest.addTarget(surface)
 
                 cameraDevice.createCaptureSession(listOf(surface), object: CameraCaptureSession.StateCallback(){
