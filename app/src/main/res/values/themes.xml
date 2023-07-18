@@ -45,4 +45,18 @@
         <item name="android:textSize">14sp</item>
         <item name="android:singleLine">true</item>
     </style>
+
+    <style name="MyCardView" parent="@style/Widget.MaterialComponents.CardView">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialCardView.Cut</item>
+        <item name="backgroundTint">#00FFFFFF</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.MaterialCardView.Cut" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">50dp</item>
+        <item name="cornerSizeTopLeft">50dp</item>
+        <item name="cornerSizeBottomRight">50dp</item>
+        <item name="cornerSizeBottomLeft">50dp</item>
+    </style>
+
 </resources>

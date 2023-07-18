@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import com.example.aifarmingapp.databinding.FragmentCameraBinding
 import com.example.aifarmingapp.ml.Detect
@@ -32,6 +33,7 @@ class CameraFragment : Fragment() {
     ): View {
 
         binding = FragmentCameraBinding.inflate(inflater, container, false)
+        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
         labels = FileUtil.loadLabels(requireContext(), "labels.txt")
         model = Detect.newInstance(requireContext())
         setHasOptionsMenu(true)
@@ -58,6 +60,11 @@ class CameraFragment : Fragment() {
 
             }
         }
+
+        binding.closeBtn.setOnClickListener {
+            activity?.onBackPressed()
+        }
+
         return binding.root
     }
 
@@ -77,4 +84,5 @@ class CameraFragment : Fragment() {
             viewModel.getPermission(requireContext(), requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101))
         }
     }
+
 }

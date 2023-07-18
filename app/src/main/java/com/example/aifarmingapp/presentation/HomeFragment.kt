@@ -13,12 +13,14 @@ import androidx.fragment.app.viewModels
 import com.example.aifarmingapp.R
 import com.example.aifarmingapp.databinding.FragmentCameraBinding
 import com.example.aifarmingapp.databinding.FragmentHomeBinding
+import com.example.aifarmingapp.presentation.ui.CameraFragment
 import com.example.aifarmingapp.presentation.ui.FragmentNavigation
 
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by viewModels()
+    private lateinit var navRegister: FragmentNavigation
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,7 +29,12 @@ class HomeFragment : Fragment() {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         (activity as AppCompatActivity?)!!.supportActionBar!!.show()
+        navRegister = activity as FragmentNavigation
         setHasOptionsMenu(true)
+
+        binding.detectButton.setOnClickListener {
+            navRegister.navigateFrag(CameraFragment(), true)
+        }
 
         return binding.root
     }

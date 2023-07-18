@@ -1,20 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".presentation.ui.CameraFragment">
 
     <TextureView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:id="@+id/textureView"
-    />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#000"
-        android:id="@+id/imageView">
-    </ImageView>
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:background="#FFF"
+        android:padding="16dp" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        style="@style/MyCardView"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/closeBtn"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/close_bg"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </com.google.android.material.card.MaterialCardView>
+
 </FrameLayout>
